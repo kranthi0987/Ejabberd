@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Ejabberd</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_group_chat">GroupChatActivity</string>
+    <string name="title_activity_new_group_create">NewGroupCreate</string>
+</resources>
