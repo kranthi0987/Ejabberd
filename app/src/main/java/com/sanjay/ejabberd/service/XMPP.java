@@ -227,6 +227,22 @@ public class XMPP {
         Log.i(TAG, "Time taken to register: " + (System.currentTimeMillis() - l));
     }
 
+//    public String getNickName(){
+//        Log.i(TAG, "inside getnick name, ");
+//        long l = System.currentTimeMillis();
+//        AccountManager accountManager = AccountManager.getInstance(connection);
+//        try {
+//            accountManager.getAccountAttribute()
+//        } catch (SmackException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        Log.i(TAG, "Time taken to register: " + (System.currentTimeMillis() - l));
+//    }
+
 
     public void addStanzaListener(Context context, StanzaListener stanzaListener) {
         XMPPTCPConnection connection = connectAndLogin(context);

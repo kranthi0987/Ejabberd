@@ -4,4 +4,5 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_group_chat">GroupChatActivity</string>
     <string name="title_activity_new_group_create">NewGroupCreate</string>
+    <string name="title_activity_conversation">conversation activity</string>
 </resources>

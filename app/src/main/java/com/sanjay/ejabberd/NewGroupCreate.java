@@ -1,14 +1,16 @@
 package com.sanjay.ejabberd;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.sanjay.ejabberd.app.Constants;
 import com.sanjay.ejabberd.service.XMPP;
 
@@ -18,8 +20,8 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.muc.HostedRoom;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.xdata.Form;
-import org.jivesoftware.smackx.xdata.FormField;
 import org.jxmpp.jid.DomainBareJid;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
@@ -28,13 +30,13 @@ import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.jid.util.JidUtil;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 public class NewGroupCreate extends AppCompatActivity {
     EditText editText;
-    private String TAG=NewGroupCreate.class.getSimpleName();
+    XMPPTCPConnection connection = null;
+    private String TAG = NewGroupCreate.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,17 +44,38 @@ public class NewGroupCreate extends AppCompatActivity {
         setContentView(R.layout.activity_new_group_create);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        try {
+            connection = XMPP.getInstance().getConnection();
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         editText = findViewById(R.id.editText);
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    if (createGroup(editText.getText().toString())) {
-                        Toast.makeText(getApplication(), "group created", Toast.LENGTH_SHORT).show();
+                    if (joinGroup(editText.getText().toString())) {
+                        Toast.makeText(getApplication(), "joined existed group created", Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(getApplication(), ConversationActivity.class);
+                        i.putExtra("group", editText.getText().toString());
+                        i.putExtra("username", connection.getUser().toString());
+                        startActivity(i);
+
                     } else {
-                        Toast.makeText(getApplication(), "group not created", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), "not joined", Toast.LENGTH_SHORT).show();
                     }
+//                    if (createGroup(editText.getText().toString())) {
+//                        Toast.makeText(getApplication(), "group created", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Toast.makeText(getApplication(), "group not created", Toast.LENGTH_SHORT).show();
+//                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -95,7 +118,7 @@ public class NewGroupCreate extends AppCompatActivity {
 
             muc.create(nickname).getConfigFormManager().submitConfigurationForm();
 //            muc2.create(nickname);
-//            muc.join(nickname);
+            muc.join(nickname);
 //            muc.sendMessage(message);
             return true;
         } catch (SmackException.NotConnectedException e1) {
@@ -175,13 +198,21 @@ public class NewGroupCreate extends AppCompatActivity {
 
 // Prepare a list of owners of the new room
             Set<Jid> owners = JidUtil.jidSetFrom(new String[]{"admin@206.189.136.186"});
+
             // Create the nickname.
-            Resourcepart nickname = Resourcepart.from("admin");
+            VCard mVCard = new VCard();
+
+            mVCard.load(connection, connection.getUser().asEntityBareJidIfPossible());
+            mVCard.setNickName("admin");
+            String name = mVCard.getNickName();
+
+            Resourcepart nickname = Resourcepart.from(name);
 
 //            muc.create(nickname).getConfigFormManager().submitConfigurationForm();
 //            muc2.create(nickname);
             muc.join(nickname);
-//            muc.sendMessage(message);
+            muc.sendMessage("hai");
+            Toast.makeText(getApplication(), "joined to group", Toast.LENGTH_SHORT).show();
             return true;
         } catch (SmackException.NotConnectedException e1) {
             e1.printStackTrace();
@@ -195,12 +226,12 @@ public class NewGroupCreate extends AppCompatActivity {
         String groupchatHosted = "";
         XMPPTCPConnection connection = XMPP.getInstance().getConnection();
         DomainBareJid service = connection.getServiceName();
-        Log.d(TAG, "service"+service);
+        Log.d(TAG, "service" + service);
         List<HostedRoom> hosted = MultiUserChatManager.getInstanceFor(connection).getHostedRooms(service);
 
         for (HostedRoom room : hosted) {
             groupchatHosted += room.getJid() + " ";
-            Log.d(TAG, "listAllGroups:"+groupchatHosted);
+            Log.d(TAG, "listAllGroups:" + groupchatHosted);
         }
         return true;
     }
@@ -219,6 +250,8 @@ public class NewGroupCreate extends AppCompatActivity {
 //                }
 //            }
             submitForm.setTitle(multiUserChat.getReservedNickname());
+            submitForm.setAnswer("muc#roomconfig_roomowners", "");
+            submitForm.setAnswer("muc#roomconfig_roomowners", "");
             submitForm.setAnswer("muc#roomconfig_publicroom", true);
             submitForm.setAnswer("muc#roomconfig_persistentroom", true);
             multiUserChat.sendConfigurationForm(submitForm);
