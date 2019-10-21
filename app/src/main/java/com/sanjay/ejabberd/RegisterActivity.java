@@ -15,6 +15,8 @@ import com.sanjay.ejabberd.utilies.InternetConnection;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.io.IOException;
+
 public class RegisterActivity extends AppCompatActivity {
 
     EditText e1, e2;
@@ -59,6 +61,12 @@ public class RegisterActivity extends AppCompatActivity {
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SmackException e) {
             e.printStackTrace();
         }
         return false;

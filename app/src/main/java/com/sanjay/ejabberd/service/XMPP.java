@@ -80,10 +80,10 @@ public class XMPP {
         StrictMode.setThreadPolicy(policy);
         long l = System.currentTimeMillis();
         try {
-            if(this.connection != null){
+            if (this.connection != null) {
                 Log.d(TAG, "Connection found, trying to connect");
                 this.connection.connect();
-            }else{
+            } else {
                 Log.d(TAG, "No Connection found, trying to create a new connection");
                 XMPPTCPConnectionConfiguration config = buildConfiguration();
                 SmackConfiguration.DEBUG = true;
@@ -101,7 +101,7 @@ public class XMPP {
                 this.connection.connect();
             }
         } catch (Exception e) {
-            Log.e(TAG,"some issue with getting connection :" + e.getMessage());
+            Log.e(TAG, "some issue with getting connection :" + e.getMessage());
 
         }
 
@@ -179,7 +179,7 @@ public class XMPP {
     }
 
     public void login(String user, String pass, String username)
-            throws XMPPException, SmackException, IOException, InterruptedException{
+            throws XMPPException, SmackException, IOException, InterruptedException {
         Log.i(TAG, "inside XMPP getlogin Method");
         long l = System.currentTimeMillis();
         XMPPTCPConnection connect = getConnection();
@@ -191,9 +191,9 @@ public class XMPP {
         Log.i(TAG, "Time taken to connect: " + (System.currentTimeMillis() - l));
 
         l = System.currentTimeMillis();
-        try{
+        try {
             connect.login(user, pass);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, "Issue in login, check the stacktrace");
             e.printStackTrace();
         }
@@ -207,13 +207,16 @@ public class XMPP {
 
     }
 
-    public void register(String user, String pass) throws XMPPException, SmackException.NoResponseException, SmackException.NotConnectedException {
+    public void register(String user, String pass) throws XMPPException, SmackException, InterruptedException, IOException {
         Log.i(TAG, "inside XMPP register method, " + user + " : " + pass);
         long l = System.currentTimeMillis();
+        AccountManager accountManager = AccountManager.getInstance(XMPP.getInstance().getConnection());
         try {
-            AccountManager accountManager = AccountManager.getInstance(getConnection());
-            accountManager.sensitiveOperationOverInsecureConnection(true);
-            accountManager.createAccount(Localpart.from(user), pass);
+            if (accountManager.supportsAccountCreation()) {
+                accountManager.sensitiveOperationOverInsecureConnection(true);
+                accountManager.createAccount(Localpart.from(user), pass);
+
+            }
         } catch (SmackException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -225,26 +228,26 @@ public class XMPP {
     }
 
 
-    public void addStanzaListener(Context context, StanzaListener stanzaListener){
-        XMPPTCPConnection connection =  connectAndLogin(context);
+    public void addStanzaListener(Context context, StanzaListener stanzaListener) {
+        XMPPTCPConnection connection = connectAndLogin(context);
         connection.addAsyncStanzaListener(stanzaListener, null);
     }
 
-    public void removeStanzaListener(Context context, StanzaListener stanzaListener){
-        XMPPTCPConnection connection =  connectAndLogin(context);
+    public void removeStanzaListener(Context context, StanzaListener stanzaListener) {
+        XMPPTCPConnection connection = connectAndLogin(context);
         connection.removeAsyncStanzaListener(stanzaListener);
     }
 
-    public void addChatListener(Context context, ChatManagerListener chatManagerListener){
+    public void addChatListener(Context context, ChatManagerListener chatManagerListener) {
         ChatManager.getInstanceFor(connectAndLogin(context))
                 .addChatListener(chatManagerListener);
     }
 
-    public void removeChatListener(Context context, ChatManagerListener chatManagerListener){
+    public void removeChatListener(Context context, ChatManagerListener chatManagerListener) {
         ChatManager.getInstanceFor(connectAndLogin(context)).removeChatListener(chatManagerListener);
     }
 
-    public void getSrvDeliveryManager(Context context){
+    public void getSrvDeliveryManager(Context context) {
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                 .getInstanceFor(XMPP.getInstance().connectAndLogin(
                         context));
@@ -257,22 +260,22 @@ public class XMPP {
 
     }
 
-    public String getUserLocalPart(Context context){
-        return  connectAndLogin(context).getUser().getLocalpart().toString();
+    public String getUserLocalPart(Context context) {
+        return connectAndLogin(context).getUser().getLocalpart().toString();
     }
 
-    public EntityFullJid getUser(Context context){
-        return  connectAndLogin(context).getUser();
+    public EntityFullJid getUser(Context context) {
+        return connectAndLogin(context).getUser();
     }
 
-    public Chat getThreadChat(Context context, String party1, String party2){
+    public Chat getThreadChat(Context context, String party1, String party2) {
         Chat chat = ChatManager.getInstanceFor(
                 XMPP.getInstance().connectAndLogin(context))
                 .getThreadChat(party1 + "-" + party2);
         return chat;
     }
 
-    public Chat createChat(Context context, EntityJid jid, String party1, String party2, ChatMessageListener messageListener){
+    public Chat createChat(Context context, EntityJid jid, String party1, String party2, ChatMessageListener messageListener) {
         Chat chat = ChatManager.getInstanceFor(
                 XMPP.getInstance().connectAndLogin(context))
                 .createChat(jid, party1 + "-" + party2,
@@ -280,7 +283,7 @@ public class XMPP {
         return chat;
     }
 
-    public void sendPacket(Context context, Stanza packet){
+    public void sendPacket(Context context, Stanza packet) {
         try {
             connectAndLogin(context).sendStanza(packet);
         } catch (SmackException.NotConnectedException e) {

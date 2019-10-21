@@ -7,13 +7,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.sanjay.ejabberd.service.XMPP;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jxmpp.util.XmppDateTime;
 
 import java.io.IOException;
+
+import static com.sanjay.ejabberd.app.Constants.ACTION_LOGGED_IN;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -38,6 +42,18 @@ public class LoginActivity extends AppCompatActivity {
                 if(login(username, password, "")){
                     Intent i1=new Intent(LoginActivity.this,GroupChatActivity.class);
                     startActivity(i1);
+                    Toast.makeText(LoginActivity.this,"success fully loggd in",Toast.LENGTH_SHORT).show();
+                    try {
+                        System.out.println("name = " + XMPP.getInstance().getConnection().getUser().toString());
+                    } catch (XMPPException e) {
+                        e.printStackTrace();
+                    } catch (SmackException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -48,31 +64,33 @@ public class LoginActivity extends AppCompatActivity {
         try {
 
             XMPP.getInstance().login(user, pass, username);
-            sendBroadcast(new Intent("liveapp.loggedin"));
+            sendBroadcast(new Intent(ACTION_LOGGED_IN));
 
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             try {
-
-                XMPP.getInstance()
-                        .login(user, pass, username);
-                sendBroadcast(new Intent("liveapp.loggedin"));
+                XMPP.getInstance().login(user, pass, username);
+                sendBroadcast(new Intent(ACTION_LOGGED_IN));
 
                 return true;
             } catch (XMPPException e1) {
                 e1.printStackTrace();
+                return false;
             } catch (SmackException e1) {
                 e1.printStackTrace();
+                return false;
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
+                return false;
             } catch (IOException e1) {
                 e1.printStackTrace();
+                return false;
             } catch (Exception e1) {
                 e1.printStackTrace();
+                return false;
             }
         }
-        return false;
     }
 
 }
