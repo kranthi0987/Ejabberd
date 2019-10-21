@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019.
+ * Project created and maintained by sanjay kranthi kumar
+ * if need to contribute contact us on
+ * kranthi0987@gmail.com
+ */
+
 package com.sanjay.ejabberd;
 
 import android.content.BroadcastReceiver;
@@ -17,20 +24,14 @@ import com.sanjay.ejabberd.utilies.ConnectionUtils;
 
 import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
-import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
-
-import java.io.IOException;
 
 import co.intentservice.chatui.ChatView;
 import co.intentservice.chatui.models.ChatMessage;
@@ -51,17 +52,13 @@ public class ConversationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_conversation);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
         connection = connectionUtils.getXmptcConnection();
-
         Intent intent = getIntent();
         if (intent != null) {
             name = intent.getStringExtra("group");
             username = intent.getStringExtra("username");
         }
         mChatView = findViewById(R.id.rooster_chat_view);
-
         mChatView.setOnSentMessageListener(new ChatView.OnSentMessageListener() {
             @Override
             public boolean sendMessage(ChatMessage chatMessage) {
@@ -69,7 +66,6 @@ public class ConversationActivity extends AppCompatActivity {
                 if (XMPP.getInstance().isConnected()) {
                     Log.d(TAG, "The client is connected to the server,Sending Message");
                     //Send the message to the server
-
                     Intent intent = new Intent(Constants.SEND_MESSAGE);
                     intent.putExtra(Constants.BUNDLE_MESSAGE_BODY,
                             mChatView.getTypedMessage());
@@ -111,56 +107,11 @@ public class ConversationActivity extends AppCompatActivity {
             Message message = new Message(jid, Message.Type.chat);
             message.setBody(body);
             chat.send(message);
-
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean createJoinGroup(String message) throws InterruptedException, IOException, SmackException, XMPPException {
-        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(XMPP.getInstance().getConnection());
-
-//        try {
-//            muc.create(StringUtils.parseName(XMPP.getInstance().getConnection(getActivity()).getUser()));
-//            muc.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
-//        } catch (XMPPException e) {
-//        } catch (SmackException.NoResponseException e) {
-//            e.printStackTrace();
-//        } catch (SmackException e) {
-//            e.printStackTrace();
-//        }
-
-//        for (int i = 0; i < alSelectedContacts.size(); i++) {
-//
-//            Log.e("tag", "group chating purpose1 ::" + alSelectedContacts.get(i).get("id"));
-//            try {
-//                muc.invite((alSelectedContacts.get(i).get("id") + "_user") + "@" + XMPP.HOST,
-//                        alSelectedContacts.get(i).get("id") + "_user");
-//            } catch (SmackException.NotConnectedException e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-
-        // Create the XMPP address (JID) of the MUC.
-        EntityBareJid mucJid = (EntityBareJid) JidCreate.bareFrom("g1@conference.206.189.136.186");
-
-        // Create the nickname.
-        Resourcepart nickname = Resourcepart.from("anusha");
-
-// Create a MultiUserChat using an XMPPConnection for a room
-        MultiUserChat muc2 = manager.getMultiUserChat(mucJid);
-        try {
-            muc2.join(nickname);
-            muc2.sendMessage(message);
-        } catch (SmackException.NotConnectedException e1) {
-            e1.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     @Override
@@ -183,7 +134,6 @@ public class ConversationActivity extends AppCompatActivity {
                 } else {
                     contactJid = from;
                 }
-
                 //Bundle up the intent and send the broadcast.
                 Intent intent = new Intent(Constants.NEW_MESSAGE);
                 intent.setPackage(getApplication().getPackageName());
@@ -192,7 +142,6 @@ public class ConversationActivity extends AppCompatActivity {
                 getApplication().sendBroadcast(intent);
                 Log.d(TAG, "Received message from :" + contactJid + " broadcast sent.");
                 ///ADDED
-
             }
         });
 
@@ -210,25 +159,18 @@ public class ConversationActivity extends AppCompatActivity {
                     case Constants.NEW_MESSAGE:
                         String from = intent.getStringExtra(Constants.BUNDLE_FROM_JID);
                         String body = intent.getStringExtra(Constants.BUNDLE_MESSAGE_BODY);
-
                         if (from.equals(contactJid)) {
                             ChatMessage chatMessage = new ChatMessage(body, System.currentTimeMillis(), ChatMessage.Type.RECEIVED);
                             mChatView.addMessage(chatMessage);
-
                         } else {
                             Log.d(TAG, "Got a message from jid :" + from);
                         }
-
                         return;
                 }
-
             }
         };
-
         IntentFilter filter = new IntentFilter(Constants.NEW_MESSAGE);
         registerReceiver(mBroadcastReceiver, filter);
-
-
     }
 
     @Override

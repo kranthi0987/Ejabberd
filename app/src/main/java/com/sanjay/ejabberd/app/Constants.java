@@ -1,10 +1,19 @@
+/*
+ * Copyright (c) 2019.
+ * Project created and maintained by sanjay kranthi kumar
+ * if need to contribute contact us on
+ * kranthi0987@gmail.com
+ */
+
 package com.sanjay.ejabberd.app;
+
+import com.sanjay.ejabberd.database.EjabberdDatabaseHelper;
 
 public class Constants {
 
     public static final int PORT = 5222;
+    public static EjabberdDatabaseHelper ejabberdDatabaseHelper = new EjabberdDatabaseHelper(OelpchatApplication.getContext());
 
-    private static String TAG = "Ejabberd";
     public static final String ACTION_LOGGED_IN = "ejabberd.loggedin";
     //    public static String HOST = "3.86.245.10";
     public static String HOST = "206.189.136.186";
