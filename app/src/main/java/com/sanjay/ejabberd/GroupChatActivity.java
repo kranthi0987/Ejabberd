@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.sanjay.ejabberd.app.Constants;
@@ -13,17 +12,13 @@ import com.sanjay.ejabberd.service.XMPP;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smack.util.dns.HostAddress;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
-import org.jivesoftware.smackx.xdata.Form;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Resourcepart;
 
 import java.io.IOException;
-import java.security.acl.Group;
 
 public class GroupChatActivity extends AppCompatActivity {
 
@@ -92,6 +87,7 @@ public class GroupChatActivity extends AppCompatActivity {
 //        }
 
         // Create the XMPP address (JID) of the MUC.
+//        chat
         EntityBareJid mucJid = (EntityBareJid) JidCreate.bareFrom("g1@conference." + Constants.HOST);
 
         // Create the nickname.
